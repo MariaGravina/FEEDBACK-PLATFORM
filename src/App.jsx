@@ -105,7 +105,7 @@ function App() {
               transition: 'all 0.3s ease', transform: hoverScrivi ? 'scale(1.03)' : 'scale(1)'
             }}
           >
-            SCRIVI UN FEEDBACK
+            LASCIA UN FEEDBACK
           </button>
           <button    
             onClick={() => setSchermata('leggi')} 
