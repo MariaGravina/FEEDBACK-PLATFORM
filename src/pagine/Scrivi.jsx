@@ -11,7 +11,7 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
   const [categoria, setCategoria] = useState(isAltro ? 'Altro' : inizialeCategoria)
   const [altraCategoria, setAltraCategoria] = useState(isAltro ? inizialeCategoria.replace('Altro: ', '') : '')
   const [messaggio, setMessaggio] = useState(datiPrecompilati ? datiPrecompilati.dati.messaggio : '')
-  const [hoverStelle, setHoverStelle] = useState(0) // 🌟 Adesso è sincronizzato correttamente sotto!
+  const [hoverStelle, setHoverStelle] = useState(0)
   const [errore, setErrore] = useState('')
   const [successoMsg, setSuccessoMsg] = useState('')
 
@@ -63,7 +63,12 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
       data: dataOra
     }
 
-    setSuccessoMsg(" Feedback inviato con successo! Grazie per il tuo contributo. ")
+    // 🌟 MODIFICA QUI: Sceglie il testo giusto in base a se stiamo modificando o creando
+    const testoSuccesso = datiPrecompilati 
+      ? "Feedback modificato con successo!" 
+      : "Feedback inviato con successo! Grazie per il tuo contributo!"
+
+    setSuccessoMsg(testoSuccesso)
 
     setTimeout(() => {
       const successo = onInvia(feedbackDaInviare)
@@ -71,15 +76,57 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
         setSuccessoMsg('') 
         setErrore("Esiste già una recensione con questa identica combinazione di email e messaggio.")
       }
-    }, 5000)
+    }, 3000)
   }
 
   const stileRiga = { display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: '25px' }
   const stileEtichetta = { width: '150px', minWidth: '150px', fontWeight: '600', color: '#4a5568', fontSize: '16px' }
   const stileInput = { width: '100%', padding: '12px 20px', borderRadius: '50px', border: '2px solid #7490c9', outline: 'none', fontSize: '16px', backgroundColor: 'white', boxSizing: 'border-box' }
 
+  const stileOverlay = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+  }
+
+  const stileFinestraSuccesso = {
+    backgroundColor: '#e6fffa',
+    color: '#234e52',
+    padding: '30px 40px',
+    borderRadius: '20px',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    border: '3px solid #319795',
+    fontSize: '20px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+    maxWidth: '450px',
+    width: '90%',
+    animation: 'scendiAlCentro 0.5s ease forwards'
+  }
+
   return (
     <div style={{ width: '95%', maxWidth: '750px', fontFamily: 'sans-serif', padding: '20px 0' }}>
+      
+      <style>{`
+        @keyframes scendiAlCentro {
+          from {
+            transform: translateY(-100px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+
       <h2 style={{ color: '#7490c9', fontSize: '38px', textAlign: 'center', fontWeight: 'bold', marginBottom: '35px' }}>
         {datiPrecompilati ? 'Modifica il Feedback' : 'Inviaci il tuo feedback'}
       </h2>
@@ -91,8 +138,10 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
       )}
 
       {successoMsg && (
-        <div style={{ backgroundColor: '#e6fffa', color: '#234e52', padding: '18px 20px', borderRadius: '12px', marginBottom: '25px', fontWeight: 'bold', textAlign: 'center', border: '2px solid #319795', fontSize: '16px' }}>
-          {successoMsg}
+        <div style={stileOverlay}>
+          <div style={stileFinestraSuccesso}>
+            {successoMsg}
+          </div>
         </div>
       )}
       
