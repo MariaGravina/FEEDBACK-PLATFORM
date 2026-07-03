@@ -106,7 +106,7 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
         <div style={stileRiga}>
           <label style={stileEtichetta}>Categoria *</label>
           <div style={{ flex: 1 }}>
-            <select value={categoria} onChange={(e) => setCategoria(e.target.value)} style={stileInput}>
+            <select value={categoria} onChange={(e) => setCategoria(e.target.value)}placeholder="Categoria" style={stileInput}>
               <option value="Bug">👾 Bug</option>
               <option value="Suggerimento">💡 Suggerimento</option>
               <option value="Complimento">👏 Complimento</option>
