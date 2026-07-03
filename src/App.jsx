@@ -105,7 +105,7 @@ function App() {
               transition: 'all 0.3s ease', transform: hoverScrivi ? 'scale(1.03)' : 'scale(1)'
             }}
           >
-            SCRIVI UNA NUOVA RECENSIONE
+            SCRIVI UN FEEDBACK
           </button>
           <button    
             onClick={() => setSchermata('leggi')} 
@@ -117,7 +117,7 @@ function App() {
               transition: 'all 0.3s ease', transform: hoverLeggi ? 'scale(1.03)' : 'scale(1)'
             }}
           >
-            LEGGI LE RECENSIONI
+            VISUALIZZA / GESTISCI I FEEDBACK
           </button>
         </div>
       )}

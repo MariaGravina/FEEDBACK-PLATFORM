@@ -1,23 +1,24 @@
 import { useState } from 'react'
 
-// Rimosso "lista = []" che non veniva usato
 function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
   const [nome, setNome] = useState(datiPrecompilati ? datiPrecompilati.dati.nome : '')
   const [email, setEmail] = useState(datiPrecompilati ? datiPrecompilati.dati.email : '')
   const [voto, setVoto] = useState(datiPrecompilati ? datiPrecompilati.dati.voto : 0)
   
-  const inizialeCategoria = datiPrecompilati ? datiPrecompilati.dati.categoria : 'Bug'
+  const inizialeCategoria = datiPrecompilati ? datiPrecompilati.dati.categoria : ''
   const isAltro = inizialeCategoria.startsWith('Altro:')
   
   const [categoria, setCategoria] = useState(isAltro ? 'Altro' : inizialeCategoria)
   const [altraCategoria, setAltraCategoria] = useState(isAltro ? inizialeCategoria.replace('Altro: ', '') : '')
   const [messaggio, setMessaggio] = useState(datiPrecompilati ? datiPrecompilati.dati.messaggio : '')
-  const [hoverStelle, setHoverStelle] = useState(0)
+  const [hoverStelle, setHoverStelle] = useState(0) // 🌟 Adesso è sincronizzato correttamente sotto!
   const [errore, setErrore] = useState('')
+  const [successoMsg, setSuccessoMsg] = useState('')
 
   const gestisciInvio = (e) => {
     e.preventDefault()
     setErrore('') 
+    setSuccessoMsg('')
 
     if (!nome.trim() || !email.trim()) {
       setErrore("Tutti i campi obbligatori devono essere compilati.")
@@ -35,6 +36,11 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
       return
     }
 
+    if (!categoria) {
+      setErrore("Seleziona una categoria valida per la tua segnalazione.")
+      return
+    }
+
     if (messaggio.trim().length < 10) {
       setErrore("Il messaggio deve contenere almeno 10 caratteri.")
       return
@@ -42,8 +48,8 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
 
     if (categoria === 'Altro' && !altraCategoria.trim()) {
       setErrore("Specifica la categoria 'Altro'.")
-  return
-}
+      return
+    }
 
     const stringaCategoria = categoria === 'Altro' ? `Altro: ${altraCategoria}` : categoria
     const dataOra = datiPrecompilati ? datiPrecompilati.dati.data : new Date().toLocaleString('it-IT')
@@ -57,11 +63,15 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
       data: dataOra
     }
 
-    // Invia i dati e controlla se App.jsx ha accettato l'inserimento
-    const successo = onInvia(feedbackDaInviare)
-    if (!successo) {
-      setErrore("Esiste già una recensione con questa identica combinazione di email e messaggio.")
-    }
+    setSuccessoMsg(" Feedback inviato con successo! Grazie per il tuo contributo. ")
+
+    setTimeout(() => {
+      const successo = onInvia(feedbackDaInviare)
+      if (!successo) {
+        setSuccessoMsg('') 
+        setErrore("Esiste già una recensione con questa identica combinazione di email e messaggio.")
+      }
+    }, 5000)
   }
 
   const stileRiga = { display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: '25px' }
@@ -79,16 +89,26 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
           ⚠️ {errore}
         </div>
       )}
+
+      {successoMsg && (
+        <div style={{ backgroundColor: '#e6fffa', color: '#234e52', padding: '18px 20px', borderRadius: '12px', marginBottom: '25px', fontWeight: 'bold', textAlign: 'center', border: '2px solid #319795', fontSize: '16px' }}>
+          {successoMsg}
+        </div>
+      )}
       
       <form onSubmit={gestisciInvio} style={{ width: '100%' }}>
         <div style={stileRiga}>
           <label style={stileEtichetta}>Nome *</label>
-          <div style={{ flex: 1 }}><input type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Tuo Nome" style={stileInput} /></div>
+          <div style={{ flex: 1 }}>
+            <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Tuo Nome" style={stileInput} disabled={!!successoMsg} />
+          </div>
         </div>
 
         <div style={stileRiga}>
           <label style={stileEtichetta}>Email *</label>
-          <div style={{ flex: 1 }}><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tua@email.com" style={stileInput} /></div>
+          <div style={{ flex: 1 }}>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tua@email.com" style={stileInput} disabled={!!successoMsg} />
+          </div>
         </div>
 
         <div style={stileRiga}>
@@ -96,9 +116,14 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
           <div style={{ display: 'flex', gap: '8px', flex: 1 }}>
             {[1, 2, 3, 4, 5].map((stella) => (
               <span
-                key={stella} onClick={() => setVoto(stella)} onMouseEnter={() => setHoverStelle(stella)} onMouseLeave={() => setHoverStelle(0)}
-                style={{ fontSize: '36px', cursor: 'pointer', color: stella <= (hoverStelle || voto) ? '#FFD700' : '#CBD5E0', transition: 'all 0.15s ease', transform: stella === (hoverStelle || voto) ? 'scale(1.15)' : 'scale(1)', lineHeight: '1' }}
-              >★</span>
+                key={stella} 
+                onClick={() => !successoMsg && setVoto(stella)} 
+                onMouseEnter={() => !successoMsg && setHoverStelle(stella)} 
+                onMouseLeave={() => !successoMsg && setHoverStelle(0)}
+                style={{ fontSize: '36px', cursor: successoMsg ? 'default' : 'pointer', color: stella <= (hoverStelle || voto) ? '#FFD700' : '#CBD5E0', transition: 'all 0.15s ease', transform: stella === (hoverStelle || voto) ? 'scale(1.15)' : 'scale(1)', lineHeight: '1' }}
+              >
+                ★
+              </span>
             ))}
           </div>
         </div>
@@ -106,7 +131,8 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
         <div style={stileRiga}>
           <label style={stileEtichetta}>Categoria *</label>
           <div style={{ flex: 1 }}>
-            <select value={categoria} onChange={(e) => setCategoria(e.target.value)}placeholder="Categoria" style={stileInput}>
+            <select value={categoria} onChange={(e) => setCategoria(e.target.value)} style={stileInput} disabled={!!successoMsg}>
+              <option value="" disabled>Scegli una categoria</option>
               <option value="Bug">👾 Bug</option>
               <option value="Suggerimento">💡 Suggerimento</option>
               <option value="Complimento">👏 Complimento</option>
@@ -120,7 +146,7 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
           <div style={{ ...stileRiga, alignItems: 'flex-start', marginBottom: '10px' }}>
             <label style={{ ...stileEtichetta, paddingTop: '10px' }}>Specifica Altro *</label>
             <div style={{ flex: 1 }}>
-              <input type="text" value={altraCategoria} maxLength={50} onChange={(e) => setAltraCategoria(e.target.value)} placeholder="Inserisci la categoria..." style={stileInput} />
+              <input type="text" value={altraCategoria} maxLength={50} onChange={(e) => setAltraCategoria(e.target.value)} placeholder="Inserisci la categoria..." style={stileInput} disabled={!!successoMsg} />
             </div>
           </div>
         )}
@@ -128,15 +154,15 @@ function Scrivi({ onInvia, onTornaHome, datiPrecompilati }) {
         <div style={{ ...stileRiga, alignItems: 'flex-start', marginBottom: '10px' }}>
           <label style={{ ...stileEtichetta, paddingTop: '10px' }}>Messaggio *</label>
           <div style={{ flex: 1 }}>
-            <textarea value={messaggio} maxLength={1000} onChange={(e) => setMessaggio(e.target.value)} placeholder="Scrivi qui..." style={{ ...stileInput, height: '140px', borderRadius: '20px', resize: 'none' }} />
+            <textarea value={messaggio} maxLength={1000} onChange={(e) => setMessaggio(e.target.value)} placeholder="Scrivi qui..." style={{ ...stileInput, height: '140px', borderRadius: '20px', resize: 'none' }} disabled={!!successoMsg} />
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', marginTop: '30px' }}>
-          <button type="submit" style={{ padding: '16px 80px', backgroundColor: '#7490c9', color: 'white', border: 'none', borderRadius: '50px', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', width: '100%', maxWidth: '350px' }}>
+          <button type="submit" disabled={!!successoMsg} style={{ padding: '16px 80px', backgroundColor: successoMsg ? '#cbd5e0' : '#7490c9', color: 'white', border: 'none', borderRadius: '50px', fontSize: '18px', fontWeight: 'bold', cursor: successoMsg ? 'default' : 'pointer', width: '100%', maxWidth: '350px' }}>
             {datiPrecompilati ? 'Salva Modifiche' : 'Invia Segnalazione'}
           </button>
-          <button type="button" onClick={onTornaHome} style={{ background: 'none', border: 'none', color: '#a0aec0', cursor: 'pointer', textDecoration: 'underline', fontSize: '16px' }}>Annulla</button>
+          <button type="button" onClick={onTornaHome} disabled={!!successoMsg} style={{ background: 'none', border: 'none', color: '#a0aec0', cursor: successoMsg ? 'default' : 'pointer', textDecoration: 'underline', fontSize: '16px' }}>Annulla</button>
         </div>
       </form>
     </div>

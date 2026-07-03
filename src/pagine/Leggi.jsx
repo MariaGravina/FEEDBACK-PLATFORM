@@ -97,7 +97,7 @@ function Leggi({ lista = [], onTornaHome, onModifica, onElimina, onAggiornaStato
 
   return (
     <div style={{ textAlign: 'center', fontFamily: 'sans-serif', width: '100%', maxWidth: '850px', maxHeight: '90vh', overflowY: 'auto', padding: '10px 20px', boxSizing: 'border-box' }}>
-      <h2 style={{ color: '#7490c9', fontSize: '36px', marginBottom: '20px', fontWeight: 'bold' }}>Recensioni Ricevute</h2>
+      <h2 style={{ color: '#7490c9', fontSize: '36px', marginBottom: '20px', fontWeight: 'bold' }}>FEEDBACK RICEVUTI</h2>
 
       {/* BARRA STRUMENTI FILTRI (LIVE: si applicano subito, senza bottone) */}
       {lista.length > 0 && (
@@ -133,7 +133,6 @@ function Leggi({ lista = [], onTornaHome, onModifica, onElimina, onAggiornaStato
             </select>
           </div>
 
-          {/* Seconda riga: Ordinamenti (data + voto) */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
             <select value={ordinamentoData} onChange={(e) => setOrdinamentoData(e.target.value)} style={stileInputFiltro}>
               <option value="data-decrescente">📅 Data: Più recenti</option>
@@ -166,8 +165,8 @@ function Leggi({ lista = [], onTornaHome, onModifica, onElimina, onAggiornaStato
               }}
             >
               <div style={{ position: 'absolute', top: '15px', right: '15px', display: 'flex', gap: '15px' }}>
-                <button onClick={() => onModifica && onModifica(fb.originaleIndex)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', padding: '5px' }}>✏️</button>
-                <button onClick={() => onElimina && onElimina(fb.originaleIndex)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', padding: '5px' }}>🗑️</button>
+                <button onClick={() => onModifica && onModifica(fb.originaleIndex)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', padding: '5px' }}><span title="Modifica questo feedback" style={{ cursor: 'pointer' }}>✏️</span></button>
+                <button onClick={() => onElimina && onElimina(fb.originaleIndex)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', padding: '5px' }}><span title="Elimina questo feedback" style={{ cursor: 'pointer' }}>🗑️</span></button>
               </div>
 
               <div style={{ marginBottom: '10px', paddingRight: '80px' }}>
